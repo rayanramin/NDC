@@ -24,7 +24,7 @@ dev.off()
 
 ## FINDING REGIONS OF SIGNIFICANT ENRICHMENT OR PEAKS##
 library(R.utils)
-assign(paste(T,"SPD",sep="_"), as.data.frame(seqToIntervals(T$POS[[T[,4] > (sd(T[,4], na.rm=T)*5) ])) )
+assign(paste(T,"SPD",sep="_"), as.data.frame(seqToIntervals(T$POS[[T[,4] > (sd(T[,4], na.rm=TRUE)*5) ])) )
 
 ## EXPORT LIST OF PEAKS AS A BED FILE##
 
