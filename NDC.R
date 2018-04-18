@@ -39,7 +39,7 @@ z[,1] <- T[1,1]
 names(z) <- c("chr.", "from","to")
 z
 }
-x = T_SPD
+x = "T_SPD"
 assign(paste(x) ,fixSPD(x))
 write.table(as.data.frame(get(x)), paste(x,".bed", sep=""), quote=F, sep="\t", row.names=F, col.names=F)
 
