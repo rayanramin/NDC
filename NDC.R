@@ -1,10 +1,12 @@
 ## IMPORTING ALL THE DEPTH FILES ( from $ samtools depth -aa control.alignment.bam > control.depth ) ##
-C <- read.table("control.depth")
-T <- read.table("treatment.depth")
+Control <- read.table("control.depth")
+Treatment <- read.table("treatment.depth")
 mav = function(x,n=100){filter(x,rep(1/n,n),sides=2)}
-mC <- mean(C[,3])
-mT <- mean(T[,3])
-T[,4] <-  ((mav(T[,3]) / mT ) - (mav(C[,3]) / mC ))
+mC <- mean(Control[,3])
+mT <- mean(Treatment[,3])
+#calculating NDC :
+Treatment[,4] <-  ((mav(Treatment[,3]) / mT ) - (mav(Control[,3]) / mC ))
+#calculateing the 5 sigma threshold
 FSD <- sd(T[,4], na.rm=TRUE)*5
 names(T) <- c("Chr", "POS", "COV" ,"NDC")
 
@@ -13,8 +15,8 @@ options(bitmapType='cairo')
 
 png(filename = "NDC.png" ,height = 6, width = 24, units = "in", res = 400)
 par( mai = c(1,1,0.7,0.2))
-xl <- pretty(T[,2], n = 10)/10^6
-plot(T[,2]/1e6, T[,4], type = "l",main = "NDC" ,axes=F, cex.main =2.5 , xlab = "", ylab="")
+xl <- pretty(Treatment[,2], n = 10)/10^6
+plot(Treatment[,2]/1e6, Treatment[,4], type = "l",main = "NDC" ,axes=F, cex.main =2.5 , xlab = "", ylab="")
 axis(2,cex.axis=2)
 axis (1, cex.lab=2 ,cex.axis = 2,cex=2 , at =xl , labels = paste(xl, "Mbp", sep = ""), las=1)
 abline(h= FSD , col="red")
@@ -25,7 +27,7 @@ dev.off()
 
 ## FINDING REGIONS OF SIGNIFICANT ENRICHMENT OR PEAKS##
 library(R.utils)
-T_SPD <- seqToIntervals(T$POS[T$NDC > FSD])
+T_SPD <- seqToIntervals(Treatment$POS[Treatment$NDC > FSD])
 T_SPD <- as.data.frame(T_SPD)
 
 
@@ -44,6 +46,7 @@ assign(paste(x) ,fixSPD(x))
 write.table(as.data.frame(get(x)), paste(x,".bed", sep=""), quote=F, sep="\t", row.names=F, col.names=F)
 
 ## INTERSECTING SPD WITH ANNOTATION FILE ## NEEDS BEDTOOLS ##
+#Credit to Altuna Akalin # http://zvfak.blogspot.com/2011/02/calling-bedtools-from-r.html #
 
 bedTools.2in = function(functionstring="bedIntersect",bed1,bed2,opt.string=""){
  #create temp files
